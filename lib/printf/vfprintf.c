@@ -435,7 +435,7 @@ reswitch:	switch (ch) {
 			if (flags & INTMAX_SIZE)
 				ujval = SJARG();
 			else
-				ulval = SARG();
+				ulval = (u_long)SARG();
 
 			if (printfrr_ext_char(fmt[0])) {
 				n2 = printfrr_exti(buf, sizeof(buf), fmt, prec,
@@ -456,7 +456,7 @@ reswitch:	switch (ch) {
 				}
 			} else {
 				if ((long)ulval < 0) {
-					ulval = -ulval;
+					ulval = (u_long)-ulval;
 					sign = '-';
 				}
 			}
