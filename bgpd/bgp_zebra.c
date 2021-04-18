@@ -1403,11 +1403,23 @@ void bgp_zebra_announce(struct bgp_dest *dest, const struct prefix *p,
 	is_add = (valid_nh_count || nhg_id) ? true : false;
 
 	if (is_add && CHECK_FLAG(bm->flags, BM_FLAG_SEND_EXTRA_DATA_TO_ZEBRA)) {
-		struct aspath *aspath = info->attr->aspath;
+		struct bgp_zebra_opaque bzo = {};
+
+		strlcpy(bzo.aspath, info->attr->aspath->str,
+			sizeof(bzo.aspath));
+
+		if (info->attr->flag & ATTR_FLAG_BIT(BGP_ATTR_COMMUNITIES))
+			strlcpy(bzo.community, info->attr->community->str,
+				sizeof(bzo.community));
+
+		if (info->attr->flag
+		    & ATTR_FLAG_BIT(BGP_ATTR_LARGE_COMMUNITIES))
+			strlcpy(bzo.lcommunity, info->attr->lcommunity->str,
+				sizeof(bzo.lcommunity));
 
 		SET_FLAG(api.message, ZAPI_MESSAGE_OPAQUE);
-		api.opaque.length = strlen(aspath->str) + 1;
-		memcpy(api.opaque.data, aspath->str, api.opaque.length);
+		api.opaque.length = sizeof(struct bgp_zebra_opaque);
+		memcpy(api.opaque.data, &bzo, api.opaque.length);
 	}
 
 	if (allow_recursion)

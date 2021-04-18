@@ -22,6 +22,19 @@
 #define _QUAGGA_BGP_ZEBRA_H
 
 #include "vxlan.h"
+#include "bgpd/bgp_aspath.h"
+#include "bgpd/bgp_community.h"
+#include "bgpd/bgp_lcommunity.h"
+
+struct bgp_zebra_opaque {
+	char aspath[ASPATH_STR_DEFAULT_LEN];
+
+	/* Show at least 10 communities AA:BB */
+	char community[COMMUNITY_SIZE * 20];
+
+	/* Show at least 10 large-communities AA:BB:CC */
+	char lcommunity[LCOMMUNITY_SIZE * 30];
+};
 
 /* Default weight for next hop, if doing weighted ECMP. */
 #define BGP_ZEBRA_DEFAULT_NHOP_WEIGHT 1
