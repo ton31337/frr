@@ -58,6 +58,7 @@
 #include "northbound_cli.h"
 #include "zebra/zebra_nb.h"
 #include "zebra/kernel_netlink.h"
+#include "lib/route_opaque.h"
 
 extern int allow_delete;
 
@@ -421,6 +422,8 @@ static void show_nexthop_detail_helper(struct vty *vty,
 static void zebra_show_ip_route_opaque(struct vty *vty, struct route_entry *re,
 				       struct json_object *json)
 {
+	struct bgp_zebra_opaque bzo = {};
+
 	if (!re->opaque)
 		return;
 
@@ -433,13 +436,27 @@ static void zebra_show_ip_route_opaque(struct vty *vty, struct route_entry *re,
 			vty_out(vty, "    Opaque Data: %s",
 				(char *)re->opaque->data);
 		break;
-	case ZEBRA_ROUTE_BGP:
-		if (json)
-			json_object_string_add(json, "asPath",
-					       (char *)re->opaque->data);
-		else
-			vty_out(vty, "    AS-Path: %s",
-				(char *)re->opaque->data);
+	case ZEBRA_ROUTE_BGP: {
+		memcpy(&bzo, re->opaque->data, sizeof(bzo));
+
+		if (json) {
+			json_object_string_add(json, "asPath", bzo.aspath);
+			json_object_string_add(json, "communities",
+					       bzo.community);
+			json_object_string_add(json, "largeCommunities",
+					       bzo.lcommunity);
+		} else {
+			vty_out(vty, "    AS-Path          : %s\n", bzo.aspath);
+
+			if (strlen(bzo.community))
+				vty_out(vty, "    Communities      : %s\n",
+					bzo.community);
+
+			if (strlen(bzo.lcommunity))
+				vty_out(vty, "    Large-Communities: %s\n",
+					bzo.lcommunity);
+		}
+	}
 	default:
 		break;
 	}
