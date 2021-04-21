@@ -106,5 +106,6 @@ extern void bgp_remove_community_from_aggregate(struct bgp_aggregate *aggregate,
 extern void bgp_remove_comm_from_aggregate_hash(struct bgp_aggregate *aggregate,
 						struct community *community);
 extern void bgp_aggr_community_remove(void *arg);
+extern bool community_valid(const char *community);
 
 #endif /* _QUAGGA_BGP_COMMUNITY_H */
