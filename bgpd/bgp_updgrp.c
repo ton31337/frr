@@ -106,9 +106,9 @@ static void sync_init(struct update_subgroup *subgrp,
 	 * bounds
 	 * checking for every single attribute as we construct an UPDATE.
 	 */
-	subgrp->work = stream_new(peer->max_packet_size
-				  + BGP_MAX_PACKET_SIZE_OVERFLOW);
-	subgrp->scratch = stream_new(peer->max_packet_size);
+	subgrp->work =
+		stream_new(BGP_MAX_PACKET_SIZE + BGP_MAX_PACKET_SIZE_OVERFLOW);
+	subgrp->scratch = stream_new(BGP_MAX_PACKET_SIZE);
 }
 
 static void sync_delete(struct update_subgroup *subgrp)
